@@ -31,7 +31,7 @@ export class jsonCards {
    */
   add(card: magicCard) {
     if (fs.existsSync(`${directorioUsuario}/${card.id_}.json`)) {
-      throw chalk.red(new Error(`Card already exists in ${process.env.USER}`));
+      console.log(chalk.red((`Card already exists in ${process.env.USER}`)));
     } else {
       fs.writeFileSync(
         `${directorioUsuario}/${card.id_}.json`,
@@ -50,7 +50,7 @@ export class jsonCards {
       fs.unlinkSync(`${directorioUsuario}/${cardID}.json`);
       console.log(chalk.green("Card deleted"));
     } else {
-      throw chalk.red(new Error(`Card not found in ${process.env.USER}`));
+      console.log(chalk.red((`Card not found in ${process.env.USER}`)));
     }
   }
 
@@ -77,7 +77,7 @@ export class jsonCards {
         console.log(chalk.blue(`Strength/Resistance: ${card.strRes_}`));
       }
     } else {
-      throw chalk.red(new Error(`Card not found in ${process.env.USER}`));
+      console.log(chalk.red((`Card not found in ${process.env.USER}`)));
     }
   }
 
@@ -93,7 +93,7 @@ export class jsonCards {
       );
       console.log(chalk.green("Card updated"));
     } else {
-      throw chalk.red(new Error(`Card not found in ${process.env.USER}`));
+      console.log(chalk.red((`Card not found in ${process.env.USER}`)));
     }
   }
 
@@ -119,10 +119,10 @@ export class jsonCards {
         );
         console.log(chalk.green("Card modified"));
       } else {
-        throw chalk.red(new Error("Property not found in object magicCard"));
+        console.log(chalk.red(("Property not found in object magicCard")));
       }
     } else {
-      throw chalk.red(new Error(`Card not found in ${process.env.USER}`));
+      console.log(chalk.red(`Card not found in ${process.env.USER}`));
     }
   }
 
