@@ -6,7 +6,6 @@ import { magicCard, color, tipe, rare} from '../src/magiCard.js';
 import fs from 'fs';
 import chalk from 'chalk';
 
-
 const directorioUsuario = `./src/usuarios/${process.env.USER}`;
 
 describe('JsonController', () => {
@@ -46,15 +45,21 @@ describe('JsonController', () => {
   });
 
   it('should not add a card already exist', () => {
+    const preadd = fs.readdirSync(directorioUsuario).length;
     const controller = new jsonCards();
     const cart = new magicCard(0,'Cazador', 16, color.multicolor, tipe.creature, rare.mythicRare, 'No puede atacar cuerpo a cuerpo', 150, 100, 1000);
-    expect(() => controller.add(cart)).to.throw(chalk.red(Error (`Card already exists in ${process.env.USER}`)));
+    controller.add(cart);
+    const postadd = fs.readdirSync(directorioUsuario).length;
+    expect(postadd).to.be.equal(preadd);
   });
 
   it('should update a card', () => {
+    const preadd = fs.readdirSync(directorioUsuario).length;
     const controller = new jsonCards();
     const newCart = new magicCard(10000,'Jose', 16, color.multicolor, tipe.creature, rare.mythicRare, 'No puede atacar cuerpo a cuerpo', 150, 100, 1000);
-    expect(() => controller.update(newCart)).to.throw(chalk.red(new Error(`Card not found in ${process.env.USER}`)));
+    controller.update(newCart);
+    const postadd = fs.readdirSync(directorioUsuario).length;
+    expect(postadd).to.be.equal(preadd);
   });
 
   it('should update a card', () => {
