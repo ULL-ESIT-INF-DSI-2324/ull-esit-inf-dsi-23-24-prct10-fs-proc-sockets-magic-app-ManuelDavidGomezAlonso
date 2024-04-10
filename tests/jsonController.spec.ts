@@ -132,4 +132,23 @@ describe('JsonController', () => {
     }
     expect(files).to.be.equal(undefined);
   });
+
+  it('should show a card', () => {
+    const controller = new jsonCards();
+    const cart = new magicCard
+    ('jose', 0,'Cazador', 16, color.multicolor, tipe.creature, rare.mythicRare, 'No puede atacar cuerpo a cuerpo', 150, 100, 1000);
+    if (!fs.existsSync(`${directorioUsuario}/0.json`)){
+      controller.add(cart);
+    }
+    controller.showCard('jose', 0);
+    const cardData = fs.readFileSync(`${directorioUsuario}/0.json`, 'utf-8');
+    const card = JSON.parse(cardData);
+    expect(card.name_).to.be.equal(cart.name_);
+  });
+
+  it('should show a card', () => {
+    const controller = new jsonCards();
+    controller.showCard('jose', 1000);
+    expect(!fs.existsSync(`${directorioUsuario}/1000.json`));
+  });
 });
