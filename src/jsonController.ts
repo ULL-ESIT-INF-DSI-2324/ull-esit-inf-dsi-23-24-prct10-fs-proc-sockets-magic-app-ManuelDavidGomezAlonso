@@ -119,10 +119,10 @@ export class jsonCards {
         );
         console.log(chalk.green("Card modified"));
       } else {
-        console.log(chalk.red(("Property not found in object magicCard")));
+        console.log(chalk.red(new Error("Property not found in object magicCard")));
       }
     } else {
-      console.log(chalk.red(`Card not found in ${process.env.USER}`));
+      throw chalk.red(new Error(`Card not found in ${process.env.USER}`));
     }
   }
 

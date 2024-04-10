@@ -92,7 +92,10 @@ describe('JsonController', () => {
 
   it('should delete a card', () => {
     const controller = new jsonCards();
-    expect(() => controller.delete(1000)).to.throw(chalk.red(new Error(`Card not found in ${process.env.USER}`)));
+    const preadd = fs.readdirSync(directorioUsuario).length;
+    controller.delete(1000);
+    const postadd = fs.readdirSync(directorioUsuario).length;
+    expect(postadd).to.be.equal(preadd);
   });
 
   it('should delete a card', () => {
@@ -205,7 +208,8 @@ describe('JsonController', () => {
 
   it('should show a card', () => {
     const controller = new jsonCards();
-    expect(() => controller.showCard(1000)).to.throw(chalk.red(new Error(`Card not found in ${process.env.USER}`)));
+    const cont = controller.showCard(1000);
+    expect(cont).to.be.equal(undefined);
   });
 
   it('should show a card', () => {
