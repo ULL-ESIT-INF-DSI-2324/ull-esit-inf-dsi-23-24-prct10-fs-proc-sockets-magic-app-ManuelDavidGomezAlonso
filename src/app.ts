@@ -12,6 +12,11 @@ import yargs, { Options } from "yargs";
  
  */
 const commonArgs: { [key: string]: Options } = {
+  user: {
+    description: "User",
+    type: "string",
+    demandOption: true,
+  },
   id: {
     description: "Card ID",
     type: "number",
@@ -67,6 +72,9 @@ const commonArgs: { [key: string]: Options } = {
  * @param argv Argumentos de la carta.
  */
 function comprube(argv: magicCard) {
+  if (typeof argv.user !== "string") {
+    throw chalk.red(new Error("User must be a string"));
+  }
   if (isNaN(argv.id_)) {
     throw chalk.red(new Error("ID must be a number"));
   }
@@ -152,6 +160,7 @@ const argv = yargs(hideBin(process.argv))
     },
     (argv) => {
       const card = new magicCard(
+        argv.user as string,
         argv.id as number,
         argv.name as string,
         argv.manaCost as number,
@@ -189,7 +198,7 @@ const argv = yargs(hideBin(process.argv))
         throw chalk.red(new Error("ID must be a number"));
       }
       const json = new jsonCards();
-      json.delete(argv.id);
+      json.delete(argv.user as string, argv.id);
     },
   )
 
@@ -213,7 +222,7 @@ const argv = yargs(hideBin(process.argv))
         throw chalk.red(new Error("ID must be a number"));
       }
       const json = new jsonCards();
-      console.log(json.showCard(argv.id));
+      console.log(json.showCard(argv.user as string, argv.id));
     },
   )
 
@@ -269,14 +278,7 @@ const argv = yargs(hideBin(process.argv))
       ) {
         throw chalk.red(new Error("New value must be a string or a number"));
       }
-
-      const json = new jsonCards();
-      json.modify(
-        argv.id as number,
-        argv.valueToChange as string,
-        argv.newValue as string | number,
-      );
-    },
+    }
   )
 
   /**
@@ -292,6 +294,7 @@ const argv = yargs(hideBin(process.argv))
     (argv) => {
       const json = new jsonCards();
       const card = new magicCard(
+        argv.user as string,
         argv.id as number,
         argv.name as string,
         argv.manaCost as number,
@@ -312,9 +315,14 @@ const argv = yargs(hideBin(process.argv))
    * @brief Comando para mostrar todas las cartas de la colección, utiliza la función showAllCards de la clase jsonCards.
    * __Ejemplo de uso:__ node dist/app.js showAll
    */
-  .command("showAll", "Show all cards from collection", () => {
+  .command("showAll", "Show all cards from collection", {
+    user: {
+    description: "User",
+    type: "string",
+    demandOption: true,
+  }}, (argv) => {
     const json = new jsonCards();
-    console.log(json.showAllCards());
+    console.log(json.showAllCards(argv.user as string));
   })
 
   .help().argv;
