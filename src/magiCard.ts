@@ -43,6 +43,7 @@ export enum tipe {
  */
 export class magicCard {
   constructor(
+    public user: string,
     public id_: number,
     public name_: string,
     public manaCost_: number,

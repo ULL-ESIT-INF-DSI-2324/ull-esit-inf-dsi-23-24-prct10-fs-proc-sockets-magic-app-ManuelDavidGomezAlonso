@@ -6,7 +6,7 @@ import * as fs from "fs";
 import { magicCard } from "./magiCard.js";
 import chalk from "chalk";
 
-const directorioUsuario = `./src/usuarios/${process.env.USER}`;
+const directorioUsuario = `./src/usuarios/`;
 
 /**
  * Clase jsonCards, implementa los métodos para añadir, eliminar, mostrar, modificar y mostrar todas las cartas de un usuario.
@@ -20,9 +20,6 @@ export class jsonCards {
     if (!fs.existsSync("./src/usuarios")) {
       fs.mkdirSync("./src/usuarios");
     }
-    if (!fs.existsSync(directorioUsuario)) {
-      fs.mkdirSync(directorioUsuario);
-    }
   }
 
   /**
@@ -30,11 +27,14 @@ export class jsonCards {
    * @param card Carta a añadir.
    */
   add(card: magicCard) {
-    if (fs.existsSync(`${directorioUsuario}/${card.id_}.json`)) {
+    if (!fs.existsSync(`${directorioUsuario}/${card.user}`)) {
+      fs.mkdirSync(`${directorioUsuario}/${card.user}`);
+    }
+    if (fs.existsSync(`${directorioUsuario}/${card.user}/${card.id_}.json`)) {
       console.log(chalk.red((`Card already exists in ${process.env.USER}`)));
     } else {
       fs.writeFileSync(
-        `${directorioUsuario}/${card.id_}.json`,
+        `${directorioUsuario}/${card.user}/${card.id_}.json`,
         JSON.stringify(card),
       );
       console.log(chalk.green("Card added"));
@@ -45,12 +45,12 @@ export class jsonCards {
    * @brief Elimina una carta del directorio del usuario.
    * @param cardID ID de la carta a eliminar.
    */
-  delete(cardID: number) {
-    if (fs.existsSync(`${directorioUsuario}/${cardID}.json`)) {
-      fs.unlinkSync(`${directorioUsuario}/${cardID}.json`);
+  delete(cardUser:string, cardID: number) {
+    if (fs.existsSync(`${directorioUsuario}/${cardUser}/${cardID}.json`)) {
+      fs.unlinkSync(`${directorioUsuario}/${cardUser}/${cardID}.json`);
       console.log(chalk.green("Card deleted"));
     } else {
-      console.log(chalk.red((`Card not found in ${process.env.USER}`)));
+      console.log(chalk.red((`Card not found in ${cardUser} collection`)));
     }
   }
 
@@ -58,8 +58,8 @@ export class jsonCards {
    * @brief Muestra una carta del directorio del usuario.
    * @param showIDCard ID de la carta a mostrar.
    */
-  showCard(showIDCard: number) {
-    const filePath = `${directorioUsuario}/${showIDCard}.json`;
+  showCard(cardUser:string, showIDCard: number) {
+    const filePath = `${directorioUsuario}/${cardUser}/${showIDCard}.json`;
     if (fs.existsSync(filePath)) {
       console.log(chalk.green("Showing card"));
       const cardData = fs.readFileSync(filePath, "utf-8");
@@ -77,7 +77,7 @@ export class jsonCards {
         console.log(chalk.blue(`Strength/Resistance: ${card.strRes_}`));
       }
     } else {
-      console.log(chalk.red((`Card not found in ${process.env.USER}`)));
+      console.log(chalk.red((`Card not found in ${cardUser} collection`)));
     }
   }
 
@@ -86,43 +86,14 @@ export class jsonCards {
    * @param card Carta a actualizar.
    */
   update(card: magicCard) {
-    if (fs.existsSync(`${directorioUsuario}/${card.id_}.json`)) {
+    if (fs.existsSync(`${directorioUsuario}/${card.user}/${card.id_}.json`)) {
       fs.writeFileSync(
-        `${directorioUsuario}/${card.id_}.json`,
+        `${directorioUsuario}/${card.user}/${card.id_}.json`,
         JSON.stringify(card),
       );
       console.log(chalk.green("Card updated"));
     } else {
-      console.log(chalk.red((`Card not found in ${process.env.USER}`)));
-    }
-  }
-
-  /**
-   * @breif Modifica una propiedad de una carta existente.
-   * @param cardID Id de la carta a modificar.
-   * @param valueToChange Campo a modificar.
-   * @param newValue Nuevo valor del campo.
-   * Se verifica que la carta exista y que el campo a modificar exista en la carta.
-   */
-  modify(cardID: number, valueToChange: string, newValue: string | number) {
-    if (fs.existsSync(`${directorioUsuario}/${cardID}.json`)) {
-      const card = fs.readFileSync(
-        `${directorioUsuario}/${cardID}.json`,
-        "utf-8",
-      );
-      const cardObj = JSON.parse(card);
-      if (cardObj[valueToChange] !== undefined) {
-        cardObj[valueToChange] = newValue;
-        fs.writeFileSync(
-          `${directorioUsuario}/${cardID}.json`,
-          JSON.stringify(cardObj),
-        );
-        console.log(chalk.green("Card modified"));
-      } else {
-        console.log(chalk.red(new Error("Property not found in object magicCard")));
-      }
-    } else {
-      throw chalk.red(new Error(`Card not found in ${process.env.USER}`));
+      console.log(chalk.red((`Card not found in ${card.user} collection.`)));
     }
   }
 
@@ -130,12 +101,12 @@ export class jsonCards {
    * @brief Muestra todas las cartas del directorio del usuario.
    * Se leen todos los archivos del directorio del usuario y se muestran.
    */
-  showAllCards() {
-    const cards = fs.readdirSync(directorioUsuario);
+  showAllCards(cardsUser:string) {
+    const cards = fs.readdirSync(`${directorioUsuario}/${cardsUser}`);
     const cardsArray: magicCard[] = [];
     cards.forEach((card) => {
       cardsArray.push(
-        JSON.parse(fs.readFileSync(`${directorioUsuario}/${card}`, "utf-8")),
+        JSON.parse(fs.readFileSync(`${directorioUsuario}/${cardsUser}/${card}`, "utf-8")),
       );
     });
     console.log(chalk.green("Showing cards"));
