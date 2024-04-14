@@ -1,5 +1,5 @@
 /**
- * @fileoverview Este archivo contiene la declaración de los comandos, y el uso de las funciones para gestionar las cartas mediante ficheros JSON. 
+ * @fileoverview Este archivo contiene la declaración de los comandos, y el uso de las funciones para gestionar las cartas mediante ficheros JSON.
  * Manuel David Gomez Alonso.
  * DSI - PR10
  */
@@ -176,7 +176,7 @@ const argv = yargs(hideBin(process.argv))
         argv.loyalty as number | undefined,
       );
       comprube(card);
-      const json =`{
+      const json = `{
         "action": "add",
         "card": {
         "user": "${argv.user}",
@@ -220,7 +220,7 @@ const argv = yargs(hideBin(process.argv))
       if (isNaN(argv.id)) {
         throw chalk.red(new Error("ID must be a number"));
       }
-      const json =`{
+      const json = `{
         "action": "delete",
         "user": "${argv.user}",
         "id": "${argv.id}"
@@ -253,7 +253,7 @@ const argv = yargs(hideBin(process.argv))
       if (isNaN(argv.id)) {
         throw chalk.red(new Error("ID must be a number"));
       }
-      const json =`{
+      const json = `{
         "action": "show",
         "user": "${argv.user}",
         "id": "${argv.id}"
@@ -287,7 +287,7 @@ const argv = yargs(hideBin(process.argv))
         argv.loyalty as number | undefined,
       );
       comprube(card);
-      const json2 =`{
+      const json2 = `{
         "action": "update",
         "card": {
         "user": "${argv.user}",
@@ -311,38 +311,46 @@ const argv = yargs(hideBin(process.argv))
    * @brief Comando para mostrar todas las cartas de la colección, utiliza la función showAllCards de la clase jsonCards.
    * __Ejemplo de uso:__ node dist/app.js showAll
    */
-  .command("showAll", "Show all cards from collection", {
-    user: {
-    description: "User",
-    type: "string",
-    demandOption: true,
-  }}, (argv) => {
-    const json =`{
+  .command(
+    "showAll",
+    "Show all cards from collection",
+    {
+      user: {
+        description: "User",
+        type: "string",
+        demandOption: true,
+      },
+    },
+    (argv) => {
+      const json = `{
       "action": "showAll",
       "user": "${argv.user}"
     }`;
-    client.write(json);
-  })
+      client.write(json);
+    },
+  )
 
   .help().argv;
-  
-  client.on("data", (data) => {
-    const parsingData = JSON.parse(data.toString());
-    if(!parsingData.error!){
-      console.log('-----------------------------------------------------------------------------------------------------');
-      console.log(chalk.blue(`ID: ${parsingData.id_}`));
-      console.log(chalk.blue(`Name: ${parsingData.name_}`));
-      console.log(chalk.blue(`Mana Cost: ${parsingData.manaCost_}`));
-      console.log(chalk.blue(`Color: ${parsingData.color_}`));
-      console.log(chalk.blue(`Type: ${parsingData.typo_}`));
-      console.log(chalk.blue(`Rare: ${parsingData.rare_}`));
-      console.log(chalk.blue(`Rules: ${parsingData.rules_}`));
-      console.log(chalk.blue(`Loyalty: ${parsingData.loyalty_}`));
-      console.log(chalk.blue(`Value: ${parsingData.value_}`));
-      if (parsingData.strRes_) {
-        console.log(chalk.blue(`Strength/Resistance: ${parsingData.strRes_}`));
-      }
-    } else {
-      console.log(`Ha sucedido un error: ${parsingData.error}`);
+
+client.on("data", (data) => {
+  const parsingData = JSON.parse(data.toString());
+  if (!parsingData.error!) {
+    console.log(
+      "-----------------------------------------------------------------------------------------------------",
+    );
+    console.log(chalk.blue(`ID: ${parsingData.id_}`));
+    console.log(chalk.blue(`Name: ${parsingData.name_}`));
+    console.log(chalk.blue(`Mana Cost: ${parsingData.manaCost_}`));
+    console.log(chalk.blue(`Color: ${parsingData.color_}`));
+    console.log(chalk.blue(`Type: ${parsingData.typo_}`));
+    console.log(chalk.blue(`Rare: ${parsingData.rare_}`));
+    console.log(chalk.blue(`Rules: ${parsingData.rules_}`));
+    console.log(chalk.blue(`Loyalty: ${parsingData.loyalty_}`));
+    console.log(chalk.blue(`Value: ${parsingData.value_}`));
+    if (parsingData.strRes_) {
+      console.log(chalk.blue(`Strength/Resistance: ${parsingData.strRes_}`));
     }
-  });
+  } else {
+    console.log(`Ha sucedido un error: ${parsingData.error}`);
+  }
+});

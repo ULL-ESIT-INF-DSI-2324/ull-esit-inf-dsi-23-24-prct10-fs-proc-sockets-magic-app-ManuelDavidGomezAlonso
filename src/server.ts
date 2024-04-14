@@ -1,5 +1,5 @@
 import { jsonCards } from "./jsonController.js";
-import { magicCard} from "./magiCard.js";
+import { magicCard } from "./magiCard.js";
 import net from "net";
 
 const server = net.createServer((conection) => {
@@ -8,24 +8,48 @@ const server = net.createServer((conection) => {
     const json = JSON.parse(data.toString());
     if (json.action === "add") {
       const card = new jsonCards();
-      const magiCard = new magicCard(json.card.user, json.card.id, json.card.name, json.card.manaCost, json.card.color, json.card.typo, json.card.rare, json.card.rules, json.card.value, json.card.strRes, json.card.loyalty);
+      const magiCard = new magicCard(
+        json.card.user,
+        json.card.id,
+        json.card.name,
+        json.card.manaCost,
+        json.card.color,
+        json.card.typo,
+        json.card.rare,
+        json.card.rules,
+        json.card.value,
+        json.card.strRes,
+        json.card.loyalty,
+      );
       card.add(magiCard);
       conection.end();
     } else if (json.action === "showAll") {
       const card = new jsonCards();
       const collection = card.showAllCards(json.user);
-      if(collection.length !== 0) {
+      if (collection.length !== 0) {
         collection.forEach((cards) => {
-          const jsoncard = JSON.stringify(cards)
+          const jsoncard = JSON.stringify(cards);
           conection.write(jsoncard);
         });
       } else {
-        conection.write(`{"error": "Colección vacía."}`)
+        conection.write(`{"error": "Colección vacía."}`);
       }
       conection.end();
     } else if (json.action === "update") {
       const card = new jsonCards();
-      const magiCard = new magicCard(json.card.user, json.card.id, json.card.name, json.card.manaCost, json.card.color, json.card.typo, json.card.rare, json.card.rules, json.card.value, json.card.strRes, json.card.loyalty);
+      const magiCard = new magicCard(
+        json.card.user,
+        json.card.id,
+        json.card.name,
+        json.card.manaCost,
+        json.card.color,
+        json.card.typo,
+        json.card.rare,
+        json.card.rules,
+        json.card.value,
+        json.card.strRes,
+        json.card.loyalty,
+      );
       card.update(magiCard);
       conection.end();
     } else if (json.action === "delete") {
@@ -35,7 +59,7 @@ const server = net.createServer((conection) => {
       conection.end();
     } else if (json.action === "show") {
       const card = new jsonCards();
-      if (card.showCard(json.user, json.id)){
+      if (card.showCard(json.user, json.id)) {
         const json2 = card.showCard(json.user, json.id);
         conection.write(JSON.stringify(json2));
       }
@@ -45,10 +69,10 @@ const server = net.createServer((conection) => {
       conection.end();
     }
   });
-  server.on('close', () => {
+  server.on("close", () => {
     conection.end();
   });
-})
+});
 
 server.listen(60300, () => {
   console.log("Server listening on port 60300");
