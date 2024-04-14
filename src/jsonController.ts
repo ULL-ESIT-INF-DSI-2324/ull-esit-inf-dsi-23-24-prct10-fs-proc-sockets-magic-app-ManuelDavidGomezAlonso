@@ -76,8 +76,11 @@ export class jsonCards {
       if (card.strRes_) {
         console.log(chalk.blue(`Strength/Resistance: ${card.strRes_}`));
       }
+      return card;
     } else {
-      console.log(chalk.red((`Card not found in ${cardUser} collection`)));
+      //creando un json con un campo error.
+      const json = `"error": "Not  found card in ${cardUser} collection"`;
+      return json;
     }
   }
 
@@ -129,5 +132,6 @@ export class jsonCards {
         console.log(chalk.blue(`Strength/Resistance: ${card.strRes_}`));
       }
     });
+    return cardsArray;
   }
 }

@@ -3,13 +3,14 @@
  */
 import { hideBin } from "yargs/helpers";
 import { magicCard, color, tipe, rare } from "./magiCard.js";
-import { jsonCards } from "./jsonController.js"
 import chalk from "chalk";
 import yargs, { Options } from "yargs";
+import net from "net";
+
+const client = net.connect({ port: 60300 });
 
 /**
  * @brief Argumentos comunes para los comandos.
- 
  */
 const commonArgs: { [key: string]: Options } = {
   user: {
@@ -173,8 +174,23 @@ const argv = yargs(hideBin(process.argv))
         argv.loyalty as number | undefined,
       );
       comprube(card);
-      const json = new jsonCards();
-      json.add(card);
+      const json =`{
+        "action": "add",
+        "card": {
+        "user": "${argv.user}",
+        "id": "${argv.id}",
+        "name": "${argv.name}",
+        "manaCost": "${argv.manaCost}",
+        "color": "${argv.color}",
+        "type": "${argv.type}",
+        "rare": "${argv.rare}",
+        "rules": "${argv.rules}",
+        "value": "${argv.value}",
+        "strRes": "${argv.strRes}",
+        "loyalty": "${argv.loyalty}"
+      }
+      }`;
+      client.write(json);
     },
   )
 
@@ -187,6 +203,11 @@ const argv = yargs(hideBin(process.argv))
     "delete",
     "Deleting a card from collection",
     {
+      user: {
+        description: "User",
+        type: "string",
+        demandOption: true,
+      },
       id: {
         description: "Card ID",
         type: "number",
@@ -197,8 +218,12 @@ const argv = yargs(hideBin(process.argv))
       if (isNaN(argv.id)) {
         throw chalk.red(new Error("ID must be a number"));
       }
-      const json = new jsonCards();
-      json.delete(argv.user as string, argv.id);
+      const json =`{
+        "action": "delete",
+        "user": "${argv.user}",
+        "id": "${argv.id}"
+      }`;
+      client.write(json);
     },
   )
 
@@ -211,55 +236,14 @@ const argv = yargs(hideBin(process.argv))
     "show",
     "Show a card from collection",
     {
-      id: {
-        description: "Card ID",
-        type: "number",
-        demandOption: true,
-      },
-    },
-    (argv) => {
-      if (isNaN(argv.id)) {
-        throw chalk.red(new Error("ID must be a number"));
-      }
-      const json = new jsonCards();
-      console.log(json.showCard(argv.user as string, argv.id));
-    },
-  )
-
-  /**
-   * @brief Comando para modificar una carta de la colección, utiliza la función modify de la clase jsonCards para modificar una carta mediante un campo.
-   * @param id ID de la carta a modificar.
-   * @param valueToChange Valor a cambiar.
-   * @param newValue Nuevo valor.
-   * Los campos que se pongan en valueToChange deberán finalizar en un _ los disponibles son los siguientes:
-   * - name_
-   * - manaCost_
-   * - color_
-   * - typo_
-   * - rare_
-   * - rules_
-   * - loyalty_
-   * - value_
-   * - strRes_
-   * __Ejemplo de uso:__ node dist/app.js modify --id 1 --valueToChange name_ --newValue "Carta1"
-   */
-  .command(
-    "modify",
-    "Modify a card from collection",
-    {
-      id: {
-        description: "Card ID",
-        type: "number",
-        demandOption: true,
-      },
-      valueToChange: {
-        description: "Value to change",
+      user: {
+        description: "User",
         type: "string",
         demandOption: true,
       },
-      newValue: {
-        description: "New value",
-        type: "string" as "string" | "number",
+      id: {
+        description: "Card ID",
+        type: "number",
         demandOption: true,
       },
     },
@@ -267,18 +251,13 @@ const argv = yargs(hideBin(process.argv))
       if (isNaN(argv.id)) {
         throw chalk.red(new Error("ID must be a number"));
       }
-
-      if (typeof argv.valueToChange !== "string") {
-        throw chalk.red(new Error("Value to change must be a string"));
-      }
-
-      if (
-        typeof argv.newValue !== "string" &&
-        typeof argv.newValue !== "number"
-      ) {
-        throw chalk.red(new Error("New value must be a string or a number"));
-      }
-    }
+      const json =`{
+        "action": "show",
+        "user": "${argv.user}",
+        "id": "${argv.id}"
+      }`;
+      client.write(json);
+    },
   )
 
   /**
@@ -292,7 +271,6 @@ const argv = yargs(hideBin(process.argv))
       ...commonArgs,
     },
     (argv) => {
-      const json = new jsonCards();
       const card = new magicCard(
         argv.user as string,
         argv.id as number,
@@ -307,7 +285,23 @@ const argv = yargs(hideBin(process.argv))
         argv.loyalty as number | undefined,
       );
       comprube(card);
-      json.update(card);
+      const json2 =`{
+        "action": "update",
+        "card": {
+        "user": "${argv.user}",
+        "id": "${argv.id}",
+        "name": "${argv.name}",
+        "manaCost": "${argv.manaCost}",
+        "color": "${argv.color}",
+        "type": "${argv.type}",
+        "rare": "${argv.rare}",
+        "rules": "${argv.rules}",
+        "value": "${argv.value}",
+        "strRes": "${argv.strRes}",
+        "loyalty": "${argv.loyalty}"
+      }
+      }`;
+      client.write(json2);
     },
   )
 
@@ -321,8 +315,32 @@ const argv = yargs(hideBin(process.argv))
     type: "string",
     demandOption: true,
   }}, (argv) => {
-    const json = new jsonCards();
-    console.log(json.showAllCards(argv.user as string));
+    const json =`{
+      "action": "showAll",
+      "user": "${argv.user}"
+    }`;
+    client.write(json);
   })
 
   .help().argv;
+  
+  client.on("data", (data) => {
+    const parsingData = JSON.parse(data.toString());
+    if(!parsingData.error!){
+      console.log('-----------------------------------------------------------------------------------------------------');
+      console.log(chalk.blue(`ID: ${parsingData.id_}`));
+      console.log(chalk.blue(`Name: ${parsingData.name_}`));
+      console.log(chalk.blue(`Mana Cost: ${parsingData.manaCost_}`));
+      console.log(chalk.blue(`Color: ${parsingData.color_}`));
+      console.log(chalk.blue(`Type: ${parsingData.typo_}`));
+      console.log(chalk.blue(`Rare: ${parsingData.rare_}`));
+      console.log(chalk.blue(`Rules: ${parsingData.rules_}`));
+      console.log(chalk.blue(`Loyalty: ${parsingData.loyalty_}`));
+      console.log(chalk.blue(`Value: ${parsingData.value_}`));
+      if (parsingData.strRes_) {
+        console.log(chalk.blue(`Strength/Resistance: ${parsingData.strRes_}`));
+      }
+    } else {
+      console.log(`Ha sucedido un error: ${parsingData.error}`);
+    }
+  });
