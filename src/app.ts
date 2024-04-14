@@ -1,5 +1,7 @@
 /**
- * @fileoverview Este archivo contiene la declaración de los comandos, y el uso de las funciones para gestionar las cartas mediante ficheros JSON.
+ * @fileoverview Este archivo contiene la declaración de los comandos, y el uso de las funciones para gestionar las cartas mediante ficheros JSON. 
+ * Manuel David Gomez Alonso.
+ * DSI - PR10
  */
 import { hideBin } from "yargs/helpers";
 import { magicCard, color, tipe, rare } from "./magiCard.js";
